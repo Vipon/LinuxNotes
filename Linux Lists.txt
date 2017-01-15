@@ -18,8 +18,8 @@ struct list_head {
     struct list_head name = LIST_HEAD_INIT(name)
 
 После этого первый элемент списка указывает сам на себя:
-
 /——\    /———\
+|  |    |    |
 | _\/__\/_   |
  \| next |   /
   -———————  /  list_head
@@ -97,13 +97,16 @@ hlist_head
 __|_______       __\/_|___       _\/_|____
 | *first | <—    | *next |<—     | *next |
 ——————————    \  —————————   \   —————————
-               \—| pprev |    \— | pprev |
+hlist_head     \—| pprev |    \— | pprev |
                  —————————       —————————
+                 hlist_node
 
 В остальном философия работы с  hlist_head похожа на предыдущий список.
 (include/linux/list.h)
 Инициализация:
 #define HLIST_HEAD(name) struct hlist_head name = {  .first = NULL }
+Получение адреса структуры, где находится элемент списка:
+#define hlist_entry(ptr, type, member) container_of(ptr,type,member)
 Добавление после головы списка:
 static inline void hlist_add_head(struct hlist_node *n, struct hlist_head *h);
 Добавление перед элементом:
