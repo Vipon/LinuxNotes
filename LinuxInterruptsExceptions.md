@@ -104,18 +104,18 @@ NAPI (new API): подход к генерации прерываний для �
 * User — обычные пользовательские процессы.
 
 Диаграмма переключения контекста:
-* user $\rightarrow$ task (exception/syscall)
-* user $\rightarrow$ irq (interrupt)
-* task $\rightarrow$ irq (interrupt)
-* task $\rightarrow$ atomic (запрет переключения)
-* task $\rightarrow$ user (iret)
-* task $\rightarrow$ task (многозадачность, вызов schedule)
-* irq $\rightarrow$ soft irq - раазрешить прерывания
-* irq $\rightarrow$ task
-* soft irq $\rightarrow$ irq
-* soft irq $\rightarrow$ task
-* atomic $\rightarrow$ task
-* atomic $\rightarrow$ irq
+* user -> task (exception/syscall)
+* user -> irq (interrupt)
+* task -> irq (interrupt)
+* task -> atomic (запрет переключения)
+* task -> user (iret)
+* task -> task (многозадачность, вызов schedule)
+* irq -> soft irq - раазрешить прерывания
+* irq -> task
+* soft -> irq
+* soft -> task
+* atomic -> task
+* atomic -> irq
 
 Проверить в каком мы сейчас контексте можно с помощью макросов:
 
