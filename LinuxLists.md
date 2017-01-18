@@ -1,4 +1,4 @@
-Списки Linux
+##Списки Linux
 
 Для каждого списка должны быть реализованы функции: инициализация, вставка и
 удаление элемента, поиск элемента в списке.
@@ -6,18 +6,26 @@
 позволяет эффективно решать данные задачи для произвольного содержимого
 списков(include/linux/types.h) - struct list_head, для этого её нужно
 включать в структуру данных.
+
+```c
 struct list_head {
     struct list_head *next, *prev;
 };
+```
 
 Функции и макросы для работы со списками описаны в (include/linux/list.h).
 Список создаётся с помощью макроса LIST_HEAD(name):
+
+```c
 #define LIST_HEAD_INIT(name) { &(name), &(name) }
 
 #define LIST_HEAD(name) \
     struct list_head name = LIST_HEAD_INIT(name)
+```
 
 После этого первый элемент списка указывает сам на себя:
+
+```
 /——\    /———\
 |  |    |    |
 | _\/__\/_   |
@@ -25,9 +33,11 @@ struct list_head {
   -———————  /  list_head
   | prev | /
   -———————
+```
 
-Получить адрес структуры данных, которая содержит list_head можно с помощью
-марса list_entry:
+Получить адрес структуры данных, которая содержит list\_head можно с помощью макроса list\_entry:
+
+```c
 /**
  * list_entry -     get the struct for this entry
  * @ptr:            the &struct list_head pointer.
@@ -46,11 +56,15 @@ struct list_head {
 #define container_of(ptr, type, member) ({          \
     const typeof( ((type *)0)->member ) *__mptr = (ptr);    \
     (type *)( (char *)__mptr - offsetof(type,member) );})
+```
 
 Таким образом когда мы используем макрос list_entry(ptr, my_type,
 list_in_my_type), он заменяется макросом container_of и раскрывается в:
+
+```c
 const typeof( ((my_type *)0)->list_in_my_type ) *__mptr = (ptr);
 (my_type *)( (char *)__mptr - offsetof(my_type,list_in_my_type) );
+```
 
 Что окончательно будет выглядеть, как:
 const list_head *__mptr = ptr;
@@ -60,12 +74,16 @@ offset обрабатывается во время компиляции и за
 list_in_my_type в типе(структуре) my_type.
 
 Кратко опишем другие функции list_head:
-list_add(new, head) - вставит элемент new после head.
-list_add_tail(new, head) - вставить new перед head.
-list_del(struct list_head *entry) - удаляет entry из списка.
-list_for_each(pos, head) - после на каждой итерации ops содержит очередной элемент из списка:
+
+```c
+list_add(new, head) // вставит элемент new после head.
+list_add_tail(new, head) // вставить new перед head.
+list_del(struct list_head *entry) // удаляет entry из списка.
+list_for_each(pos, head) // после на каждой итерации ops содержит очередной элемент из списка:
+
 #define list_for_each(pos, head) \
     for (pos = (head)->next; pos != (head); pos = pos->next)
+```
 
 Так же в Linux есть ещё один тип двунаправленных списков hlist_head
 (include/linux/types.h), которые отличаются от предыдущих тем, что их
@@ -92,6 +110,8 @@ struct hlist_node {
 хранится он в поле *next предыдущего элемента, а так как адрес поля *next
 предыдущего элемента совпадает с адресом самого элемента, то мы без лишних
 операций получаем адрес предыдущего элемента.
+
+```
 hlist_head
    /———————————————\    /—————————\   /—————\
 __|_______       __\/_|___       _\/_|____
@@ -100,42 +120,56 @@ __|_______       __\/_|___       _\/_|____
 hlist_head     \—| pprev |    \— | pprev |
                  —————————       —————————
                  hlist_node
+```
 
 В остальном философия работы с  hlist_head похожа на предыдущий список.
 (include/linux/list.h)
 Инициализация:
+```c
 #define HLIST_HEAD(name) struct hlist_head name = {  .first = NULL }
+```
 Получение адреса структуры, где находится элемент списка:
+```c
 #define hlist_entry(ptr, type, member) container_of(ptr,type,member)
+```
 Добавление после головы списка:
+```
 static inline void hlist_add_head(struct hlist_node *n, struct hlist_head *h);
+```
 Добавление перед элементом:
+```
 static inline void hlist_add_before(struct hlist_node *n, struct hlist_node *next);
+```
 Добавление после элемента:
+```
 static inline void hlist_add_behind(struct hlist_node *n, struct hlist_node *prev);
+```
 Удаление:
+```
 static inline void hlist_del(struct hlist_node *n);
+```
 Итерация по списку:
+```
 #define hlist_for_each(pos, head) \
     for (pos = (head)->first; pos ; pos = pos->next)
-
+```
 Вообще все операции со списками выполняются с помощью примитива
 синхронизации — RCU, чтобы обеспечить атомарность работы с ними. Про него
 можете прочитать в Linux Synchronization.txt.
 Чтение списка — поиск в списке. Выполняется без особых замысловатых
 движений, просто читаем:
-{
-  rcu_read_lock();
-  …
-  rcu_read_unlock();
-}
+```c
+rcu_read_lock();
+…
+rcu_read_unlock();
+```
 Удаление из списка элемента так же не сложно. При поиске не используется
 поле prev, потому его можно изменить сразу. Поле next предыдущего тоже
 можно спокойно изменить, это произойдёт атомарно. А старый элемент можно
 оставить без изменения, чтобы читало мог от туда выйти.
-{
-  next->prev = prev;
-  prev->next = next;
-}
+```c
+next->prev = prev;
+prev->next = next;
+```
 Добавление элемента в список происходят по такому же сценарию, только
 сначала создаём новый элемент и инициализируем его поля.
