@@ -1,25 +1,27 @@
-Сигналы Linux
+##Сигналы Linux
 
-Сигналы — короткое сообщение, посылаемое процессу, или группе процессов,
-чтобы:
+**Сигналы** — короткое сообщение, посылаемое процессу, или группе процессов, чтобы:
+
 * Уведомить об определённом событии.
 * Заставить выполнить обработчик сигнала.
 По мимо обычных сигналов, есть сигналы реального времени, их отличие от
 обычных, что они всегда ставятся в очередь, а потому процесс сможет их все
 обработать, в то время как с обычными сигналами не всегда.
 
-Системные вызовы отправки сигнала:
-kill( )             —   Send a signal to a thread group.
-tkill( )                —   Send a signal to a process.
-tgkill( )           —   Send a signal to a process in a specific thread group.
-sigaction( )        —   Change the action associated with a signal.
-signal( )           —   Similar to sigaction( ).
-sigpending( )   —   Check whether there are pending signals. (Проверка необработанных сигналов)
-sigprocmask( )  —   Modify the set of blocked signals(заблокированных сигналов).
-sigsuspend( )   —   Wait for a signal
+####Системные вызовы отправки сигнала:
+
+* kill( )             —   Send a signal to a thread group.
+* tkill( )                —   Send a signal to a process.
+* tgkill( )           —   Send a signal to a process in a specific thread group.
+* sigaction( )        —   Change the action associated with a signal.
+* signal( )           —   Similar to sigaction( ).
+* sigpending( )   —   Check whether there are pending signals. (Проверка необработанных сигналов)
+* sigprocmask( )  —   Modify the set of blocked signals(заблокированных сигналов).
+* sigsuspend( )   —   Wait for a signal
 
 Нужно разделять 2 задачи: отправка и обработка сигнала ядром. Каждая из них
 требует отдельного подхода:
+
 * Генерация сигнала — ядро изменяет структуру данных процесса, что означает
 отправку сигнала.
 * Доставка сигнала — реакция на сигнал, которая может наступить далеко не
@@ -28,6 +30,7 @@ sigsuspend( )   —   Wait for a signal
 сигналов не должны быть рентабельными.
 
 Реакция на доставленный сигнал зависит от ситуации и сигнала:
+
 * Игнорирование сигнала, не каждый сигнал может быть проигнорирован,
 например, SIGKILL, SIGSTOP.
 * Выполнить действие по умолчанию: завершить выполнение, сделать дамп,
@@ -50,6 +53,7 @@ kik_task - функция будет процесс
 do_signal() должна его позвать. Но тут всё не просто в работе со стеком.
 
 Последовательность действий:
+
 1. Перед возвращение в пользовательский режим ядро зовёт функцию —
 do_signal().
 2. Которая обрабатывает сигнал, вызывая handle_signal(), которая настраивает
