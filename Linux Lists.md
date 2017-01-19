@@ -76,11 +76,12 @@ list_in_my_type в типе(структуре) my_type.
 Кратко опишем другие функции list_head:
 
 ```c
-list_add(new, head) // вставит элемент new после head.
-list_add_tail(new, head) // вставить new перед head.
-list_del(struct list_head *entry) // удаляет entry из списка.
-list_for_each(pos, head) // после на каждой итерации ops содержит очередной элемент из списка:
+list_add(new, head)                 // вставит элемент new после head.
+list_add_tail(new, head)            // вставить new перед head.
+list_del(struct list_head *entry)   // удаляет entry из списка.
+list_for_each(pos, head)
 
+// после на каждой итерации ops содержит очередной элемент из списка:
 #define list_for_each(pos, head) \
     for (pos = (head)->next; pos != (head); pos = pos->next)
 ```
