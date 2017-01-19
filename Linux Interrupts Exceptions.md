@@ -149,7 +149,7 @@ NAPI (new API): подход к генерации прерываний для �
 schedule() (/kernel/sched/core.c):
 {
     ...
-    preempt_disable();                              // запрещаем вытеснение - schedule
+    preempt_disable();                  // запрещаем вытеснение - schedule
     __schedule(false);
     sched_preempt_enable_no_resched();  // разрешаем вытеснение - schedule
     ...
@@ -158,7 +158,7 @@ schedule() (/kernel/sched/core.c):
 __schedule() (/kernel/sched/core.c):
 {
     ...
-    local_irq_disable();                                // запрещаем прерывания
+    local_irq_disable();                        // запрещаем прерывания
     ...
     next = pick_next_task(rq, prev, cookie);    // получаем следующий процесс
     ...

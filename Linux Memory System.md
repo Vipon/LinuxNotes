@@ -174,10 +174,10 @@ alloc_page/__rmqueue()(mm/page_alloc.c) - выделение, __free_pages()-
 vmalloc.h)
 ```c
 struct vm_struct {
-    struct vm_struct    *next;  // <- список
-    void                *addr;  // линейный адрес первой ячейки
-    unsigned long       size;   // size + 4096(окно безопасности между несмежными областями)
-    unsigned long       flags;  // тип памяти, отображаемой несметной области
+    struct vm_struct    *next;      // <- список
+    void                *addr;      // линейный адрес первой ячейки
+    unsigned long       size;       // size + 4096(окно безопасности между несмежными областями)
+    unsigned long       flags;      // тип памяти, отображаемой несметной области
     struct page         **pages;
     unsigned int        nr_pages;
     phys_addr_t         phys_addr;
