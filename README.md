@@ -17,3 +17,5 @@
 ## Ссылки
 - [Видео-лекции на YouTube](https://www.youtube.com/watch?v=MAMGp651ez4&index=1&list=PLDrmKwRSNx7Ja7NAt21HgNAIlTvJJ4Kso)
 - [Linux Repo](https://github.com/torvalds/linux/)
+- [free-electrons(search kernel)](http://elixir.free-electrons.com/linux/latest/ident/)
+
