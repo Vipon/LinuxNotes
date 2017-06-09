@@ -57,4 +57,19 @@ struct super_block {
 ```
 
 ### Индексный дескриптор
-struct inode описывает конкретный файл в fs.
+struct inode описывает конкретный файл в fs, файл может быть переименовам, но inode при этом не изменится. Inode адресуются по номерам. В ядре, чтобы быстро найти inode есть большая хэш-тыблица (icache), ключом в которой является пара - {super_block, ino}.
+```c
+struct inode {
+    umode_t         i_mode;     /* тип файла и права доступа */
+    kuid_t          i_uid;      /* индефикатор пользователя */
+    kgid_t          i_gid;      /* индефикатор группы */
+    unsigned int    i_flags;    /* флаги файловой системы */
+    const struct inode_operations   *i_op; /* таблица виртуальных методов */
+    unsigned long   i_ino;      /* номер дискриптора */
+    unsigned int    i_nlink;    /* количество жёстких ссылок */
+    struct timespec i_atime;    /* время последжнего доспута */
+    struct timespec i_mtime;    /* время последней записи */
+    struct timespec i_ctime;    /* время изменения метаданных(inode) */
+    ...
+}
+```
