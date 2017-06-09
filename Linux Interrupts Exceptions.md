@@ -104,6 +104,7 @@ NAPI (new API): подход к генерации прерываний для �
 * User — обычные пользовательские процессы.
 
 #### Диаграмма переключения контекста:
+![contexts](https://github.com/Vipon/LinuxNotes/blob/master/images/contexts.png)
 * user -> task (exception/syscall)
 * user -> irq (interrupt)
 * task -> irq (interrupt)
