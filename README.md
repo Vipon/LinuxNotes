@@ -11,6 +11,8 @@
 - [Signals](https://github.com/Vipon/LinuxNotes/blob/master/Linux%20Signals.md)
 - [Synchronization](https://github.com/Vipon/LinuxNotes/blob/master/Linux%20Synchronization.md)
 - [User Memory Management](https://github.com/Vipon/LinuxNotes/blob/master/Linux%20User%20Memory%20Management.md)
+- [VFS](https://github.com/Vipon/LinuxNotes/blob/master/Linux%20VFS.md)
+
 
 ## Ссылки
 - [Видео-лекции на YouTube](https://www.youtube.com/watch?v=MAMGp651ez4&index=1&list=PLDrmKwRSNx7Ja7NAt21HgNAIlTvJJ4Kso)
