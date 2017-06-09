@@ -1,4 +1,4 @@
-##Списки Linux
+## Списки Linux
 
 Для каждого списка должны быть реализованы функции: инициализация, вставка и
 удаление элемента, поиск элемента в списке.
@@ -134,23 +134,23 @@ hlist_head     \—| pprev |    \— | pprev |
 #define hlist_entry(ptr, type, member) container_of(ptr,type,member)
 ```
 Добавление после головы списка:
-```
+```c
 static inline void hlist_add_head(struct hlist_node *n, struct hlist_head *h);
 ```
 Добавление перед элементом:
-```
+```c
 static inline void hlist_add_before(struct hlist_node *n, struct hlist_node *next);
 ```
 Добавление после элемента:
-```
+```c
 static inline void hlist_add_behind(struct hlist_node *n, struct hlist_node *prev);
 ```
 Удаление:
-```
+```c
 static inline void hlist_del(struct hlist_node *n);
 ```
 Итерация по списку:
-```
+```c
 #define hlist_for_each(pos, head) \
     for (pos = (head)->first; pos ; pos = pos->next)
 ```
