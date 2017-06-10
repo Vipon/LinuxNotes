@@ -45,13 +45,16 @@ struct file_system_type {
 struct super_block {
     const struct super_operations   *s_op;  /* таблица виртуальных методов
                                                             супер блока  */
-    unsigned long           s_flags;    // флаги монтирования
-    int                     s_count;    // счётчики ссылок
+    unsigned long           s_flags;    /* флаги монтирования */
+    int                     s_count;    /* счётчики ссылок */
     atomic_t                s_active;
     void                   *s_fs_info;  /* информация о суперблоке конкретной
                                                             файловой системы */
     struct dentry          *s_root;     /* элемент, описывающий корневую
                                                 директорию файловой системы */
+    ...
+    struct list_lru     s_dentry_lru;   /* Списки LRU для кэшей. */
+    struct list_lru     s_inode_lru;
     ...
 }
 ```
@@ -85,6 +88,9 @@ struct dentry {
     struct list_head d_child;       /* child of parent list */
     struct list_head d_subdirs;     /* our children */
     struct dentry_operations *d_op; /* таблица виртуальных методов */
+    struct hlist_node        d_hash;/* подвязка к dcache */
+    struct list_head         d_lru; /* подвязка к списку по времени
+                                                            использования */
     ...
 }
 ```
@@ -135,3 +141,41 @@ _____________     dentry    inode
 Это был пример работы для блочной файловой системы. Однако в случае сетевой всё должно быть немного подругому, так как файл в таком случае сможет создаться без нашего ведома, а кэш по прежнему будет говорить нам, что файла нет.
 
 Каждая файловая система может предоставить метод d_revalidate в списке виртуальных методов dentry. Данный метод всегда позовётся, если есть запись dentry в кэше. Возможная политика предварительной проверки достоверности кэша - таймаут.
+
+## Освобождение памяти
+Со временем может понадобиться освободить память, например, она просто может закончится. Об этом первым узнает buddy алокатор и позовёт reclaimer. Reclaimer чистит чистый дисковый кэш, грязный дисковый кэш, анонимную память, ядерные кэши и т.д.
+
+Dcache - ядерный кэш. Его ядро старается очищать по принципу LRU, для этого все dentry подвязаны в список с помощью поля dentry->d_lru. Голова самого списка находится внутри соответсвующего super_block.
+
+При этом дерево dentry чистится снизу вверх, если функции очистки попадается dentry, у которой есть потомки, то она выкидывается из списка LRU, где окажется после того, как счётчик ссылок на неё станет равен нулю.
+
+Ссылки на dentry держут не только её потомки. Объект fs типа fs_struct, на который есть ссылка в структуре task_struct, и объект file так же могут хранить ссылки на dentry. C fs связыны команды chroot & chdir, а file создаётся в момент открытие файла (open), чтобы хранить о нём информацию. Сами file храняться в массиве __struct files_struct *files;__, который хранится в task_struct, а номера в массиве - файловые дискрипторы.
+
+```c
+/* /include/linux/fs_struct.h */
+struct fs_struct {
+    int users;
+    spinlock_t lock;
+    seqcount_t seq;
+    int umask;
+    int in_exec;
+    struct path root, pwd;
+};
+
+/* /include/linux/path.h */
+struct path {
+    struct vfsmount *mnt;
+    struct dentry *dentry;
+};
+
+/* /include/linux/fs.h */
+struct file {
+    struct path     f_path;
+    struct inode    *f_inode;   /* cached value */
+    const struct file_operations    *f_op;
+
+    fmode_t         f_mode;
+    loff_t          f_pos;
+    ...
+}
+```
