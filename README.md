@@ -12,6 +12,7 @@
 - [Synchronization](https://github.com/Vipon/LinuxNotes/blob/master/Linux%20Synchronization.md)
 - [User Memory Management](https://github.com/Vipon/LinuxNotes/blob/master/Linux%20User%20Memory%20Management.md)
 - [VFS](https://github.com/Vipon/LinuxNotes/blob/master/Linux%20VFS.md)
+- [Page Cache](https://github.com/Vipon/LinuxNotes/blob/master/Linux%20Page%20Cache.md)
 
 
 ## Ссылки
